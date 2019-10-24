@@ -20,12 +20,19 @@ export default function(rpcMethods){
             return error(-32600, 'Invalid Request')
         if(!Array.isArray(params))
             return error(-32602, 'Invalid params');
-        if(!rpcMethods.hasOwnProperty(method) || 
-            typeof rpcMethods[method] !== 'function')
+        
+        let fn = rpcMethods;
+        for(let part of method.split('.')){
+            if(!fn.hasOwnProperty(part)) return error(-32601, 'Method not found')
+            fn = fn[part];
+        }
+
+        if(typeof fn !== 'function')
             return error(-32601, 'Method not found');
+            
         let promise;
         try {
-            promise = Promise.resolve(rpcMethods[method](...params))
+            promise = Promise.resolve(fn(...params))
         } catch (err) {
             return error(-32000, err.toString())
         }

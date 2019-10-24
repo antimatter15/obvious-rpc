@@ -8,3 +8,10 @@ export async function hello(name: string) {
         },
     ]
 }
+
+
+export const stuff = {
+    async whatever(){
+        return 42
+    }
+}
