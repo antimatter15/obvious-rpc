@@ -4,8 +4,12 @@ import myRPC from 'obvious-rpc/client'
 type APIType = typeof import('../../server/api')
 const { hello, stuff: { whatever } } : APIType = myRPC('http://localhost:2600/rpc')
 
+type Await<T> = T extends {
+    then(onfulfilled?: (value: infer U) => unknown): unknown;
+} ? U : T;
+
 export default class App extends React.Component<{
-    data: any
+    data: Await<ReturnType<typeof hello>>
 }> {
     static async getInitialProps({ req }) {
         return {
