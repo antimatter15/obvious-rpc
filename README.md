@@ -1,6 +1,6 @@
 # Obvious RPC
 
-Obvious RPC is a technique for fully strongly typed client-server communication that is so obvious you'll wonder why it hasn't always been like this. 
+Obvious RPC is a technique for strongly typed client-server communication that is so obvious you'll wonder why it hasn't always been like this. 
 
 Your API simply consists of exported async methods in a file on your server. To call them from your client, you simply import the functions and call them. It's just plain TypeScript, so you'll be able to quickly navigate to the definition of a method on your server, refactor different endpoints, and verify argument types, and use autocomplete on the results. 
 
@@ -12,7 +12,7 @@ export async function welcomeUser(name: string){
 }
 ```
 
-To use a method from your **client**, import your method from `obvious-rpc/client` and configure it with your server endpoint
+To use a method from your **client**, you'll need to `obvious-rpc/client`, import the types from `api.ts`, and configure your API server endpoint
 
 ```ts
 import myRPC from 'obvious-rpc/client'
@@ -21,6 +21,8 @@ const { welcomeUser } : APIType = myRPC('http://localhost:2600/rpc')
 
 await welcomeUser('Molly') // Hello, Molly!
 ```
+
+And that's it! You can now call functions as if they were regular functions in any library. 
 
 ## Getting Started
 
