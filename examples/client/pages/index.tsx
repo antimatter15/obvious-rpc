@@ -1,9 +1,8 @@
 import React from 'react'
+
 import myRPC from 'obvious-rpc/client'
-const {
-    hello
-} = myRPC('http://localhost:2600/rpc') as 
-    typeof import('../../server/api')
+type APIType = typeof import('../../server/api')
+const { hello } : APIType = myRPC('http://localhost:2600/rpc')
 
 
 export default class App extends React.Component<{

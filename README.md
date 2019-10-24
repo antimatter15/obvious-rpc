@@ -15,8 +15,9 @@ export async function welcomeUser(name: string){
 To use a method from your **client**, import your method from `obvious-rpc/client` and configure it with your server endpoint
 
 ```ts
-import RPC from 'obvious-rpc/client'
-const { welcomeUser } = RPC('http://localhost:2600/rpc') as import('../../server/api')
+import myRPC from 'obvious-rpc/client'
+type APIType = typeof import('../../server/api')
+const { welcomeUser } : APIType = myRPC('http://localhost:2600/rpc')
 
 await welcomeUser('Molly') // Hello, Molly!
 ```
@@ -40,12 +41,12 @@ In your main server entry point, import `api.ts` and attach it to an HTTP server
 ```ts
 import express, { Express } from 'express'
 
-import RPC from 'obvious-rpc/server'
+import middleware from 'obvious-rpc/server'
 import * as myAPI from './api'
 
 const app: Express = express()
 
-app.use('/rpc', express.json(), RPC(myAPI))
+app.use('/rpc', express.json(), middleware(myAPI))
 
 app.listen(2600)
 ```
@@ -55,8 +56,9 @@ app.listen(2600)
 In any file where you want to access your API, add the following lines
 
 ```ts
-import RPC from 'obvious-rpc/client'
-const { welcomeUser } = RPC('http://localhost:2600/rpc') as import('../../server/api')
+import myRPC from 'obvious-rpc/client'
+type APIType = typeof import('../../server/api')
+const { welcomeUser } : APIType = myRPC('http://localhost:2600/rpc')
 
 await welcomeUser('Molly') // Hello, Molly!
 ```

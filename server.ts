@@ -20,7 +20,8 @@ export default function(rpcMethods){
             return error(-32600, 'Invalid Request')
         if(!Array.isArray(params))
             return error(-32602, 'Invalid params');
-        if(typeof rpcMethods[method] !== 'function')
+        if(!rpcMethods.hasOwnProperty(method) || 
+            typeof rpcMethods[method] !== 'function')
             return error(-32601, 'Method not found');
         let promise;
         try {
