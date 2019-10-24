@@ -15,9 +15,8 @@ export async function welcomeUser(name: string){
 To use a method from your **client**, import your method from `obvious-rpc/client` and configure it with your server endpoint
 
 ```ts
-import myRPC, { welcomeUser } from 'obvious-rpc/client'
-
-myRPC.configure('http://localhost:2600/rpc')
+import RPC from 'obvious-rpc/client'
+const { welcomeUser } = RPC('http://localhost:2600/rpc') as import('../../server/api')
 
 await welcomeUser('Molly') // Hello, Molly!
 ```
@@ -31,8 +30,6 @@ For both your client and server projects, run `npm install obvious-rpc`
 In your server project, create a new file `api.ts` (note that there is nothing special about this filename, we're just using this name thoroughout the documentation).
 
 ```ts
-export { default } from 'obvious-rpc/server'
-
 export async function welcomeUser(name: string){
     return "Hello, " + name + "!"
 }
@@ -42,11 +39,13 @@ In your main server entry point, import `api.ts` and attach it to an HTTP server
 
 ```ts
 import express, { Express } from 'express'
-import myRPC, * as RPCMethods from './api'
+
+import RPC from 'obvious-rpc/server'
+import * as myAPI from './api'
 
 const app: Express = express()
 
-app.use('/rpc', express.json(), myRPC.middleware(RPCMethods))
+app.use('/rpc', express.json(), RPC(myAPI))
 
 app.listen(2600)
 ```
@@ -56,22 +55,10 @@ app.listen(2600)
 In any file where you want to access your API, add the following lines
 
 ```ts
-import myRPC, { welcomeUser } from 'obvious-rpc/client'
-
-myRPC.configure('http://localhost:2600/rpc')
+import RPC from 'obvious-rpc/client'
+const { welcomeUser } = RPC('http://localhost:2600/rpc') as import('../../server/api')
 
 await welcomeUser('Molly') // Hello, Molly!
-```
-
-Add the following lines to your `tsconfig.json`, replacing "PATH-TO-SERVER" with the relative path from your `tsconfig.json` file to your `api.ts` file (omit the `.ts` extension). 
-
-```json
-"compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-        "obvious-rpc/client": ["../PATH-TO-SERVER/api"]
-    }
-}
 ```
 
 
@@ -99,21 +86,5 @@ TODO: write about how you can configure it to reject all requests that lack prop
 
 ***Q: What's the catch?***
 
-A: The library is currently configured as a singleton, so it could lead to conflicts if you try to configure it with different endpoints. 
-
-***Q: What browsers are supported?***
-
-A: The library uses ES6 Proxies, a feature supported by all browsers besides IE11 and earlier. 
-
-***Q: How can I use it in a published library?***
-
-A: Since the library is a singleton, publishing a module that uses `obvious-rpc` may lead to conflicts. To avoid this, replace `configure` with `scoped` before you publish code depending on `obvious-rpc`. You'll probably still want to use the singleton API when developing, as otherwise you won't be able to see type information within your editor.
-
-```ts
-import myRPC from 'obvious-rpc/client'
-
-const { welcomeUser } = myRPC.scoped('https://whatever.com/rpc')
-
-```
-
+A: The library uses ES6 Proxies, a feature supported by all browsers besides IE11 and earlier. This includes Google Chrome, Firefox, Safari, and Microsoft Edge. If you're building something that needs to support IE11, this library might not be right for you. 
 
