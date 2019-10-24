@@ -10,8 +10,8 @@ export default function(rpcMethods, auth){
             }
         })
 
-        if(req.method !== 'POST') return error(-32000, 'must be POST');
-        if(!req.body) return error(-32000, 'missing request body.\n' + 
+        if(req.method !== 'POST') return error(405, 'must be POST');
+        if(!req.body) return error(400, 'missing request body.\n' + 
             'have you forgotten to include app.use(express.json())?');
         
         let method = body['method'].split('.'),
