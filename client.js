@@ -1,11 +1,11 @@
 require('isomorphic-fetch')
 
-function JSONRPC(url, auth){
-    return async function(method, params){
+function JSONRPC(url, auth) {
+    return async function(method, params) {
         let headers = {
             'Content-Type': 'application/json',
         }
-        if(auth && !/unauthenticated_/i.test(method[method.length - 1])){
+        if (auth && !/unauthenticated_/i.test(method[method.length - 1])) {
             headers['Authorization'] = await auth(method, params)
         }
         let res = await fetch(url, {
@@ -19,23 +19,26 @@ function JSONRPC(url, auth){
             }),
         })
         let data = await res.json()
-        if(data.error){
+        if (data.error) {
             throw new Error(data.error.message)
         }
-        return data.result;
+        return data.result
     }
 }
 
-function makeClient(url){
+function makeClient(url) {
     let client = JSONRPC(url)
-    function makeLayer(path){
-        return new Proxy(function(){
-            return client(path, Array.from(arguments))
-        }, {
-            get(obj, name){
-                return makeLayer(path.concat([name]))
+    function makeLayer(path) {
+        return new Proxy(
+            function() {
+                return client(path, Array.from(arguments))
+            },
+            {
+                get(obj, name) {
+                    return makeLayer(path.concat([name]))
+                },
             }
-        })
+        )
     }
     return makeLayer([])
 }
