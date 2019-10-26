@@ -1,12 +1,9 @@
 require('isomorphic-fetch')
 
-function JSONRPC(url, auth) {
+function JSONRPC(url) {
     return async function(method, params) {
         let headers = {
             'Content-Type': 'application/json',
-        }
-        if (auth && !/unauthenticated_/i.test(method[method.length - 1])) {
-            headers['Authorization'] = await auth(method, params)
         }
         let res = await fetch(url, {
             method: 'POST',

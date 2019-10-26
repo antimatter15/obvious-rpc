@@ -1,3 +1,5 @@
+import { Ctx } from 'obvious-rpc/server'
+
 export async function hello(name: string) {
     console.log('hello to', name)
     return [
@@ -9,9 +11,12 @@ export async function hello(name: string) {
     ]
 }
 
+export async function uNaUthEntIcaTeD_whatever(this: Ctx) {
+    return this.req.headers
+}
 
 export const stuff = {
-    async whatever(){
+    async whatever() {
         return 42
-    }
+    },
 }

@@ -1,4 +1,14 @@
-export default function(rpcMethods: any, auth = null) {
+import { Request, Response } from 'express'
+
+export type Ctx = {
+    req: Request
+    res: Response
+}
+
+type Middleware = (req, res, next) => void
+const noopMiddleware: Middleware = (req, res, next) => next()
+
+export default function(rpcMethods: any, authMiddleware?: Middleware) {
     return async (req, res) => {
         let body = req.body || {}
         const error = (code: number, message: string) =>
@@ -20,32 +30,39 @@ export default function(rpcMethods: any, auth = null) {
 
         let method = body['method'].split('.'),
             params = body['params']
+
         if (body['jsonrpc'] !== '2.0') return error(-32600, 'Invalid Request')
         if (!Array.isArray(params)) return error(-32602, 'Invalid params')
+        if (!/^[a-z]/i.test(method[method.length - 1]))
+            return error(-32601, 'Method name must start with letter')
 
-        if (auth && !/unauthenticated_/i.test(method[method.length - 1])) {
-            if (!(await auth(req.headers.authorization))) {
-                return error(401, 'Not Authorized')
+        let middleware =
+            authMiddleware && !/^unauthenticated/i.test(method[method.length - 1])
+                ? authMiddleware
+                : noopMiddleware
+
+        middleware(req, res, async () => {
+            let fn = rpcMethods
+            for (let part of method) {
+                if (!fn.hasOwnProperty(part)) return error(-32601, 'Method not found')
+                fn = fn[part]
             }
-        }
 
-        let fn = rpcMethods
-        for (let part of method) {
-            if (!fn.hasOwnProperty(part)) return error(-32601, 'Method not found')
-            fn = fn[part]
-        }
-
-        if (typeof fn !== 'function') return error(-32601, 'Method not found')
-
-        try {
-            let result = await fn(...params)
-            res.status(200).json({
-                jsonrpc: '2.0',
-                id: body.id,
-                result: result,
-            })
-        } catch (err) {
-            return error(500, err.toString())
-        }
+            if (typeof fn !== 'function') return error(-32601, 'Method not found')
+            try {
+                let promise = fn.apply({ req, res }, params)
+                if (!promise.then) {
+                    return error(500, 'Method did not return a promise')
+                }
+                let result = await promise
+                res.status(200).json({
+                    jsonrpc: '2.0',
+                    id: body.id,
+                    result: result,
+                })
+            } catch (err) {
+                return error(500, err.toString())
+            }
+        })
     }
 }
