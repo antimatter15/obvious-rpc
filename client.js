@@ -1,4 +1,4 @@
-require('isomorphic-fetch')
+require('cross-fetch/polyfill')
 
 function JSONRPC(url) {
     return async function(method, params) {
