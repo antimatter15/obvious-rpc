@@ -93,7 +93,7 @@ and ship with more confidence than using REST or GraphQL.
 
 **_Q: Can I use this for server-server communication?_**
 
-A: Yes. The `obvious-rpc/client` library uses `isomorphic-fetch` so it runs fine in Node.JS and
+A: Yes. The `obvious-rpc/client` library uses `cross-fetch` so it runs fine in Node.JS and
 Server Side Render environments.
 
 **_Q: How can I authenticate requests?_**
