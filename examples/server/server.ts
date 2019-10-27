@@ -5,10 +5,13 @@ import cors from 'cors'
 import * as RPCMethods from './api'
 import myRPC from 'obvious-rpc/server'
 
-
 const PORT = 2600
 const app: Express = express()
-app.use(cors())
+app.use(
+    cors({
+        maxAge: 10000,
+    })
+)
 
 app.use('/rpc', express.json(), myRPC(RPCMethods))
 

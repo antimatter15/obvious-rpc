@@ -3,7 +3,8 @@ require('isomorphic-fetch')
 function JSONRPC(url) {
     return async function(method, params) {
         let headers = {
-            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
         }
         let res = await fetch(url, {
             method: 'POST',
