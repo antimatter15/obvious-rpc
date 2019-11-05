@@ -1,31 +1,31 @@
 require('isomorphic-fetch')
 
-function JSONRPC(url) {
+function JSONPOST(url) {
     return async function(method, params) {
-        let headers = {
-            // 'Content-Type': 'application/json',
-            'Content-Type': 'text/plain',
-        }
-        let res = await fetch(url, {
+        let res = await fetch(url + '/' + method.join('.'), {
             method: 'POST',
             mode: 'cors',
-            headers: headers,
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                method: method.join('.'),
-                params: params,
-            }),
+            headers: {
+                // Sending Content-Type: application/json
+                // Triggers a CORS preflight request
+                // which can increase application latency
+                // and also hurts the developer experience
+                // so we instead just send it as text/plain
+                // even though it's kind of a lie.
+                'Content-Type': 'text/plain',
+            },
+            body: JSON.stringify(params),
         })
-        let data = await res.json()
-        if (data.error) {
-            throw new Error(data.error.message)
+        if (res.status !== 200) {
+            throw new Error(await res.text())
         }
-        return data.result
+        let data = await res.json()
+        return data
     }
 }
 
 function makeClient(url) {
-    let client = JSONRPC(url)
+    let client = JSONPOST(url)
     function makeLayer(path) {
         return new Proxy(
             function() {
