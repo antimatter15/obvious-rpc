@@ -8,7 +8,7 @@
     "start": "next dev --port 4200"
   },
   "dependencies": {
-    "next": "^9.1.1",
+    "next": "^11.1.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0"
   },
